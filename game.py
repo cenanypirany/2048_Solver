@@ -1,4 +1,3 @@
-# Starting up
 import numpy as np
 import random
 import os
@@ -20,30 +19,36 @@ def rand_2_4():
 def redraw_grid():
     grid[rand_free_coord()] = rand_2_4()
     grid[rand_free_coord()] = rand_2_4()
-    os.system('cls')
+    os.system('clear')
     print(grid)
 
 #Game Loop
-keys = ('i','k','j','l')
-up = keys[0]
-down = keys[1]
-left = keys[2]
-right = keys[3]
+keys = {
+    'up': 'i',
+    'down': 'k',
+    'left': 'j',
+    'right': 'l'
+}
 
 grid = np.zeros((4,4), dtype=int)
+redraw_grid()
 move = ''
-while True:
-    redraw_grid()
 
-    if move == up:
-        pass
-    elif move == down:
-        pass
-    elif move == left:
-        pass
-    elif move == right:
-        pass
+while True:
+    move = input()
+
+    if move in keys.values():
+        if move == keys['up']:
+            pass
+        elif move == keys['down']:
+            pass
+        elif move == keys['left']:
+            pass
+        elif move == keys['right']:
+            pass
+
+        redraw_grid()
     elif move == 'q':
         exit()
     else:
-        print(f"Please enter the keys: {keys}")
+        print(f"Please enter the keys: {keys}. Or 'q' to quit.")
