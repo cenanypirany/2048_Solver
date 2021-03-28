@@ -4,11 +4,7 @@ import os
 
 #Functions
 def rand_free_coord():
-    if 0 not in grid:
-        print("Game Over")
-        print(f"Your largest tile was: { np.max(grid) }.")
-        exit()
-    else:
+    if 0 in grid:
         free_array = np.where(grid == 0)
         free_postions = [(x, y) for x, y in zip(free_array[0], free_array[1])]
         return(random.choice(free_postions))
@@ -40,6 +36,8 @@ def press_line(line):
     return strip_zeros(line)
 
 def make_move(grid, direction):
+    orig_grid = grid
+
     if direction == 'down':
         for i in range(4):
             grid[:, i] = np.flip(press_line(np.flip(grid[:, i])))
@@ -53,7 +51,10 @@ def make_move(grid, direction):
         for i in range(4):
             grid[i, :] = press_line(grid[i, :])
     
-    return(grid)
+    if np.array_equal(orig_grid, grid):
+        return False
+    else:
+        return grid
 
 #Game Loop
 keys = {
@@ -72,8 +73,8 @@ while True:
 
     if move in keys:
         grid = make_move(grid, keys[move])
-
-        print(redraw_grid(grid))
+        if grid != False:
+            print(redraw_grid(grid))
     elif move == 'q':
         exit()
     else:
