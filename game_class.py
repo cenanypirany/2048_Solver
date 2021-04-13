@@ -15,7 +15,7 @@ class Game():
         os.system('clear')
         print(f"Turns: {self.turn_count}")
         grid = str(self.return_grid())
-        grid = grid.replace('[','|').replace(']','|').replace('0',' ')
+        grid = grid.replace('[','|').replace(']','|').replace('0',' ').replace('1 24','1024').replace('2 48','2048')
         grid = ' ' + grid[1:-1] + '\n'
         print(grid)
 
