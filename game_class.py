@@ -13,6 +13,7 @@ class Game():
 
     def print_board(self):
         os.system('clear')
+        print(f"Can move: {self.can_move()}")
         print(f"Turns: {self.turn_count}")
         grid = str(self.return_grid())
         grid = grid.replace('[','|').replace(']','|').replace('0',' ').replace('1 24','1024').replace('2 48','2048')
@@ -38,6 +39,25 @@ class Game():
     def return_grid(self):
         return(self.grid)
 
+    def can_move(self):        
+        #check up/down
+        grid = np.copy(self.grid)
+        for i in range(4):
+            grid[:, i] = self.push_line(grid[:, i])
+
+        if False in np.equal(grid, self.grid):
+            return True
+ 
+        #check left/right
+        grid = np.copy(self.grid)
+        for i in range(4):
+            grid[i, :] = self.push_line(grid[i, :])
+
+        if False in np.equal(grid, self.grid):
+            return True
+
+        return False
+
     def make_move(self, direction):
         grid = np.copy(self.grid)
         
@@ -55,7 +75,7 @@ class Game():
                 grid[i, :] = self.push_line(grid[i, :])
 
         if False not in np.equal(grid, self.grid):    
-            if 0 not in self.grid:
+            if 0 not in self.grid and not self.can_move(): 
                 self.game_over()
             else:
                 self.return_grid()
