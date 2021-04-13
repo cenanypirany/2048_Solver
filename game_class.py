@@ -14,7 +14,10 @@ class Game():
     def print_board(self):
         os.system('clear')
         print(f"Turns: {self.turn_count}")
-        print(self.return_grid())
+        grid = str(self.return_grid())
+        grid = grid.replace('[','|').replace(']','|').replace('0',' ')
+        grid = ' ' + grid[1:-1]
+        print(grid)
 
     def game_over(self):
         self.print_board()
