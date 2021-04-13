@@ -1,81 +1,24 @@
-import numpy as np
-import random
-import os
+from game_class import Game
 
-#Functions
-def rand_free_coord():
-    if 0 in grid:
-        free_array = np.where(grid == 0)
-        free_postions = [(x, y) for x, y in zip(free_array[0], free_array[1])]
-        return(random.choice(free_postions))
-
-def rand_2_4():
-    return random.choices((2,4), weights=(0.9, 0.1))[0]
-
-def redraw_grid(grid):
-    grid[rand_free_coord()] = rand_2_4()
-    grid[rand_free_coord()] = rand_2_4()
-    os.system('clear')
-    return grid
-
-def strip_zeros(line):
-    line = line[line != 0]
-    zeros = 4 - len(line)
-    for _ in range(zeros):
-        line = np.append(line, 0)
-    return line
-
-def press_line(line):
-    line = strip_zeros(line)
-    for i in range(3):
-        val_1 = line[i]
-        val_2 = line[i + 1]
-        if val_1 == val_2:
-            line[i] = val_1 * 2
-            line[i + 1] = 0    
-    return strip_zeros(line)
-
-def make_move(grid, direction):
-    orig_grid = grid
-
-    if direction == 'down':
-        for i in range(4):
-            grid[:, i] = np.flip(press_line(np.flip(grid[:, i])))
-    elif direction == 'up':
-        for i in range(4):
-            grid[:, i] = press_line(grid[:, i])
-    elif direction == 'right':
-        for i in range(4):
-            grid[i, :] = np.flip(press_line(np.flip(grid[i, :])))   
-    elif direction == 'left':
-        for i in range(4):
-            grid[i, :] = press_line(grid[i, :])
-    
-    if np.array_equal(orig_grid, grid):
-        return False
-    else:
-        return grid
-
-#Game Loop
-keys = {
-    'i': 'up',
-    'k': 'down',
-    'j': 'left',
-    'l': 'right'
+controls = {
+    'w': 'up',
+    's': 'down',
+    'a': 'left',
+    'd': 'right'
 }
 
-grid = np.zeros((4,4), dtype=int)
-print(redraw_grid(grid))
-move = ''
+game = Game()
+game.start()
+game.print_board()
 
 while True:
-    move = input()
+    move = input("Enter move: ")
 
-    if move in keys:
-        grid = make_move(grid, keys[move])
-        if grid != False:
-            print(redraw_grid(grid))
+    if move in controls:
+        game.make_move(controls[move])
+        game.print_board()
     elif move == 'q':
         exit()
     else:
-        print(f"Please enter the keys: {keys}. Or 'q' to quit.")
+        game.print_board()
+        print(f"Please enter the keys: {controls}. Or 'q' to quit.")
