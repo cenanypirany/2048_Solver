@@ -16,7 +16,7 @@ class Game():
         print(f"Turns: {self.turn_count}")
         grid = str(self.return_grid())
         grid = grid.replace('[','|').replace(']','|').replace('0',' ')
-        grid = ' ' + grid[1:-1]
+        grid = ' ' + grid[1:-1] + '\n'
         print(grid)
 
     def game_over(self):
