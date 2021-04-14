@@ -18,7 +18,7 @@ if len(sys.argv) > 1:
 else:
     mode = 'human'
 
-game = Game(mode,100)
+game = Game(mode)
 game.start()
 if mode == 'human':
     game.print_board()

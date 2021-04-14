@@ -4,7 +4,7 @@ import os
 
 class Game():
 
-    def __init__(self, mode, num_games=3):
+    def __init__(self, mode, num_games=100):
         self.grid = None
         self.turn_count = None
         self.mode = mode
