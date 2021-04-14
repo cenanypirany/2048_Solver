@@ -3,13 +3,37 @@ import random
 import os
 
 class Game():
-    def __init__(self):
-        self.grid = np.zeros((4,4), dtype=int)
-        self.turn_count = 0
+
+    def __init__(self, mode, num_games=3):
+        self.grid = None
+        self.turn_count = None
+        self.mode = mode
+        self.game_loop = True
+
+        ### For 'api' mode ###
+        self.game_stats = []
+        self.finished_games = 0
+        self.num_games = num_games
+
+    ###############################
+    ## API methods: return_stats ##
+    ###############################
+        
+    def return_stats(self):
+        return self.game_stats
+
+    ################################################################
+    ## Key methods: start, loop, print_board, end_turn, game_over ##
+    ################################################################
 
     def start(self):
+        self.grid = np.zeros((4,4), dtype=int)
+        self.turn_count = 0
         self.grid[self.get_open_coord()] = self.get_rand_2_4()
         self.grid[self.get_open_coord()] = self.get_rand_2_4()
+
+    def loop(self):
+        return self.game_loop
 
     def print_board(self):
         os.system('clear')
@@ -19,13 +43,33 @@ class Game():
         grid = ' ' + grid[1:-1] + '\n'
         print(grid)
 
+    def end_turn(self):
+        self.turn_count += 1
+        self.grid[self.get_open_coord()] = self.get_rand_2_4()
+        self.return_grid()
+
     def game_over(self):
-        self.print_board()
-        print(f"Game Over! Your highest tile is: {np.max(self.grid)}")
-        exit()
+        if self.mode == 'human':
+            self.print_board()
+            print(f"Game Over! Your highest tile is: {np.max(self.grid)}")
+            self.game_loop = False
+        elif self.mode == 'api':
+            self.finished_games += 1
+            self.game_stats.append({'Game Number': self.finished_games, 'Highest': np.max(self.grid), 'Turns': self.turn_count})
+            if self.finished_games < self.num_games:
+                self.start()
+            else:
+                self.game_loop = False
+
+    ###############################################################################
+    ## Helper functions: get_rand_2_4, return_count, get_open_coord, return_grid ##
+    ###############################################################################
 
     def get_rand_2_4(self):
         return random.choices((2,4), weights=(0.9, 0.1))[0]
+
+    def return_count(self):
+        return self.turn_count
 
     def get_open_coord(self):
         if 0 in self.grid:
@@ -37,6 +81,45 @@ class Game():
 
     def return_grid(self):
         return(self.grid)
+
+    #################################################
+    ## Central move functions: can_move, make_move ##
+    #################################################
+
+    def can_move(self):        
+        #check down
+        grid = np.copy(self.grid)
+        for i in range(4):
+            grid[:, i] = np.flip(self.push_line(np.flip(grid[:, i])))
+
+        if False in np.equal(grid, self.grid):
+            return True
+
+        #check up
+        grid = np.copy(self.grid)
+        for i in range(4):
+            grid[:, i] = self.push_line(grid[:, i])
+
+        if False in np.equal(grid, self.grid):
+            return True
+
+        #check right
+        grid = np.copy(self.grid)
+        for i in range(4):
+            grid[i, :] = np.flip(self.push_line(np.flip(grid[i, :])))
+
+        if False in np.equal(grid, self.grid):
+            return True
+ 
+        #check left
+        grid = np.copy(self.grid)
+        for i in range(4):
+            grid[i, :] = self.push_line(grid[i, :])
+
+        if False in np.equal(grid, self.grid):
+            return True
+
+        return False
 
     def make_move(self, direction):
         grid = np.copy(self.grid)
@@ -54,22 +137,20 @@ class Game():
             for i in range(4):
                 grid[i, :] = self.push_line(grid[i, :])
 
-        if False not in np.equal(grid, self.grid):    
-            if 0 not in self.grid:
-                self.game_over()
-            else:
-                self.return_grid()
-        else:
+        # Check to see if grid has changed after move, if so end turn
+        if False in np.equal(grid, self.grid):    
             self.grid = grid
             self.end_turn()
-    
-    def return_count(self):
-        return self.turn_count
+        else:
+            # If grid not changed after move, check all available move possibilities, if none then game over
+            if not self.can_move(): 
+                self.game_over()
+            else:
+                self.return_grid()    
 
-    def end_turn(self):
-        self.turn_count += 1
-        self.grid[self.get_open_coord()] = self.get_rand_2_4()
-        self.return_grid()
+    ######################################################
+    ## Number summing functions: push_line, strip_zeros ##
+    ######################################################
 
     def push_line(self, line):
         line = self.strip_zeros(line)
