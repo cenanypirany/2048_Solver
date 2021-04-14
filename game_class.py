@@ -4,15 +4,23 @@ import os
 
 class Game():
 
-    def __init__(self):
-        self.grid = np.zeros((4,4), dtype=int)
-        self.turn_count = 0
+    def __init__(self, mode, num_games=1):
+        self.grid = None
+        self.turn_count = None
+        self.mode = mode
+
+        ## For 'api' mode
+        self.game_stats = []
+        self.finished_games = 0
+        self.num_games = num_games
 
     ##########################################################
     ## Key methods: start, print_board, end_turn, game_over ##
     ##########################################################
 
     def start(self):
+        self.grid = np.zeros((4,4), dtype=int)
+        self.turn_count = 0
         self.grid[self.get_open_coord()] = self.get_rand_2_4()
         self.grid[self.get_open_coord()] = self.get_rand_2_4()
 
@@ -30,9 +38,19 @@ class Game():
         self.return_grid()
 
     def game_over(self):
-        self.print_board()
-        print(f"Game Over! Your highest tile is: {np.max(self.grid)}")
-        exit()
+        if self.mode == 'human':
+            self.print_board()
+            print(f"Game Over! Your highest tile is: {np.max(self.grid)}")
+            exit()
+        elif self.mode == 'api':
+            self.finished_games += 1
+            self.game_stats.append({'Game Number': self.finished_games, 'Highest': np.max(self.grid), 'Turns': self.turn_count})
+            if self.finished_games < self.num_games:
+                self.start()
+            else:
+                print(self.game_stats)
+                exit()
+
 
     ###############################################################################
     ## Helper functions: get_rand_2_4, return_count, get_open_coord, return_grid ##
